@@ -24,7 +24,7 @@
 							chart(canvas.value, records);
 						} else {
 							getData<ItemData>(currentMode)
-								.then((data)=>{
+								.then((data) => {
 									saveToDB(db, currentMode, data);
 								})
 						}
@@ -34,8 +34,8 @@
 	)
 
 	const getKeyRange = (cursorStart: number, cursorEnd: number): IDBKeyRange => {
-		const lowerBound: string = `${cursorStart}-01-01`;
-		const upperBound: string = `${cursorEnd}-12-31`;
+		const lowerBound: string = `${ cursorStart }-01-01`;
+		const upperBound: string = `${ cursorEnd }-12-31`;
 		return IDBKeyRange.bound(lowerBound, upperBound)
 	};
 </script>

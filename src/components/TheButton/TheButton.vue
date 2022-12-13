@@ -12,7 +12,7 @@
 	<button
 		class="the-button"
 		type="button"
-		:class="{'the-button_active': isActive}"
+		:class="{ 'the-button_active': isActive }"
 		@click="store.currentMode = selfMode"
 	>
 		<slot/>

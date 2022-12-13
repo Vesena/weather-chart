@@ -22,7 +22,7 @@
 		return false
 	});
 
-	watch(() => store[`cursor${props.rangeName}`], (val: number) => {
+	watch(() => store[`cursor${ props.rangeName }`], (val: number) => {
 		if (val) {
 			selected.value = val
 		}

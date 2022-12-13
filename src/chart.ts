@@ -1,4 +1,4 @@
-import {ItemData} from "./types";
+import { ItemData } from "./types";
 
 const WIDTH: number = 1200;
 const HEIGHT: number = 600;
@@ -51,7 +51,7 @@ export function chart(canvas: HTMLCanvasElement, data: Array<ItemData>): void {
 		ctx.font = 'normal 16px Helvetica,sans-serif'
 		ctx.fillStyle = '#96a2aa'
 		const y = step * i
-		if (rowsCount[i-1]%5 === 0){
+		if (rowsCount[i-1]%5 === 0) {
 			if (rowsCount[i-1] === 0) {
 				verticalCanvasCenter= y+ PADDING_Y;
 			}

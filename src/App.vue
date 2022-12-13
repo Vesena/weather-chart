@@ -1,51 +1,36 @@
 <script setup lang="ts">
-	import {ref, onMounted, watch} from 'vue';
-	import {getData, getIndexedDBKeys, saveToDB} from './utils';
-	import type {ItemData} from './types';
-	import {store} from './store';
+	import { onMounted } from 'vue';
+	import { getData, getIndexedDBKeys, saveToDB } from './utils';
+	import type { ItemData } from './types';
+	import { store } from './store';
 	import TheButton from './components/TheButton/TheButton.vue';
 	import RangePicker from './components/RangePicker/RangePicker.vue';
 	import TheChart from './components/TheChart/TheChart.vue';
-
-	/** data */
-
-
-	watch([() => store.db], ([db]) => {
-			if (db) {
-				console.log(3)
-				getIndexedDBKeys(db, store.currentMode)
-					.then((keys)=>{
-						console.log(keys)
-						setInitParams(keys)
-					})
-			}
-
-		})
 
 	onMounted(() => {
 		const dbRequest: IDBOpenDBRequest = indexedDB.open('weather_service_archive');
 
 		dbRequest.onupgradeneeded = (event: any): void => {
 			const db: IDBDatabase = event.target.result
-			db.createObjectStore('temperature', {keyPath: "t"});
-			db.createObjectStore('precipitation', {keyPath: "t"});
+			db.createObjectStore('temperature', { keyPath: "t" });
+			db.createObjectStore('precipitation', { keyPath: "t" });
 		}
 
 		dbRequest.onsuccess = (event: any): void => {
 			const db: IDBDatabase = event.target.result
+			store.db = db
 			getIndexedDBKeys(db, store.currentMode)
 				.then((keys) => {
 					if (keys.length === 0) {
 						getData<ItemData>(store.currentMode)
 							.then((data) => {
 								saveToDB(db, store.currentMode, data);
+								getIndexedDBKeys(db, store.currentMode)
+									.then((keys) => setInitParams(keys));
 							})
+					} else {
+						setInitParams(keys);
 					}
-					console.log(1)
-				})
-				.finally(() => {
-					console.log(2)
-					store.db = db
 				})
 		}
 	});
