@@ -2,8 +2,8 @@
 	import { ref, watch } from 'vue';
 	import { store } from '../../store';
 	import { chart } from '../../chart';
-	import { getData, saveToDB, loadData } from "../../utils";
-	import {ItemData} from "../../types";
+  	import { getData, saveToDB, getIndexedDBRecords } from "../../utils";
+	import { ItemData } from "../../types";
 
 	const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -18,12 +18,12 @@
 			if (db && cursorStart) {
 				const keyRangeValue: IDBKeyRange = getKeyRange(cursorStart, cursorEnd);
 
-				loadData(db, currentMode, keyRangeValue)
+        		getIndexedDBRecords(db, currentMode, keyRangeValue)
 					.then((records) => {
 						if (records.length) {
 							chart(canvas.value, records);
 						} else {
-							getData<ItemData>(`../data/${currentMode}.json`)
+							getData<ItemData>(currentMode)
 								.then((data)=>{
 									saveToDB(db, currentMode, data);
 								})
