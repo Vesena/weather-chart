@@ -14,29 +14,22 @@
 			const db: IDBDatabase = event.target.result
 			db.createObjectStore('temperature', { keyPath: "t" });
 			db.createObjectStore('precipitation', { keyPath: "t" });
+			getData<ItemData>(store.currentMode)
+				.then((data) => {
+					saveToDB(db, store.currentMode, data);
+				})
 		}
 
 		dbRequest.onsuccess = (event: any): void => {
 			const db: IDBDatabase = event.target.result
 			store.db = db
 			getIndexedDBKeys(db, store.currentMode)
-				.then((keys) => {
-					if (keys.length === 0) {
-						getData<ItemData>(store.currentMode)
-							.then((data) => {
-								saveToDB(db, store.currentMode, data);
-								getIndexedDBKeys(db, store.currentMode)
-									.then((keys) => setInitParams(keys));
-							})
-					} else {
-						setInitParams(keys);
-					}
-				})
+				.then((keys) => setInitParams(keys));
 		}
 	});
 
 	/** methods */
-	const setInitParams = (keys): void => {
+	const setInitParams = (keys: string[]): void => {
 		store.listBorderTop = keys[0];
 		store.listBorderBottom = keys[keys.length - 1];
 		store.cursorStart = new Date(store.listBorderTop).getFullYear();

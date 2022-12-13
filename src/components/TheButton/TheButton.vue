@@ -2,7 +2,7 @@
 	import { store } from '../../store';
 
 	/** props */
-	const props = defineProps<{
+	defineProps<{
 		selfMode: string,
 		isActive: boolean,
 	}>();

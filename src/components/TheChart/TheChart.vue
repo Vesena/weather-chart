@@ -9,13 +9,18 @@
 
 	watch(
 		[
+			() => store.isSaved,
 			() => store.db,
 			() => store.cursorStart,
 			() => store.cursorEnd,
 			() => store.currentMode,
 		],
-		([db, cursorStart, cursorEnd, currentMode]) => {
-			if (db && cursorStart) {
+		([isSaved, db, cursorStart, cursorEnd, currentMode]) => {
+			if (db && isSaved && cursorStart) {
+				getIndexedDBRecords(db, currentMode)
+					.then((records) => chart(canvas.value, records));
+				store.isSaved = false
+			} else if (db && cursorStart) {
 				const keyRangeValue: IDBKeyRange = getKeyRange(cursorStart, cursorEnd);
 
         		getIndexedDBRecords(db, currentMode, keyRangeValue)
@@ -31,7 +36,7 @@
 					})
 			}
 		}
-	)
+	);
 
 	const getKeyRange = (cursorStart: number, cursorEnd: number): IDBKeyRange => {
 		const lowerBound: string = `${ cursorStart }-01-01`;
