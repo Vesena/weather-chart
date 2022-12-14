@@ -73,7 +73,7 @@ function boundaries(array: number[]): number[] {
 	return [max, min]
 }
 
-export function chart(canvas: HTMLCanvasElement, data: Array<ItemData>): void {
+export function chart<T>(canvas: HTMLCanvasElement, data: Array<ItemData>): void {
 	verticalCanvasCenter = 0;
 
 	canvas.width = DPI_WIDTH
