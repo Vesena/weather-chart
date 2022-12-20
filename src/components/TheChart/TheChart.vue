@@ -1,42 +1,50 @@
 <script setup lang="ts">
-	import { ref, watch } from 'vue';
+	import { onMounted, ref, watch } from 'vue';
 	import { store } from '../../store';
 	import { chart } from '../../chart';
-  	import { getData, saveToDB, getIndexedDBRecords } from "../../utils";
-	import { ItemData } from "../../types";
+  	import { getData, saveDataToDB, getIndexedDBRecords } from '../../utils';
+	import { ItemData } from '../../types';
 
+	/** data */
 	const canvas = ref<HTMLCanvasElement | null>(null)
 
 	watch(
 		[
-			() => store.isSaved,
 			() => store.db,
 			() => store.cursorStart,
 			() => store.cursorEnd,
 			() => store.currentMode,
 		],
-		([isSaved, db, cursorStart, cursorEnd, currentMode]) => {
-			if (db && isSaved && cursorStart) {
-				getIndexedDBRecords(db, currentMode)
-					.then((records) => chart(canvas.value, records));
-				store.isSaved = false
-			} else if (db && cursorStart) {
+		([db, cursorStart, cursorEnd, currentMode]) => {
+			if (!store.isPageLoading) {
 				const keyRangeValue: IDBKeyRange = getKeyRange(cursorStart, cursorEnd);
 
-        		getIndexedDBRecords(db, currentMode, keyRangeValue)
+				getIndexedDBRecords(db, currentMode, keyRangeValue)
 					.then((records) => {
 						if (records.length) {
-							chart(canvas.value, records);
+							chart(store.canvas, records);
 						} else {
-							getData<ItemData>(currentMode)
+							getData<ItemData>(store.currentMode)
 								.then((data) => {
-									saveToDB(db, currentMode, data);
+									const startPosition = data.findIndex((item) => item.t === keyRangeValue.lower)
+									const endPosition = data.findIndex((item) => item.t ===keyRangeValue.upper) + 1
+									const drawRecords = data.slice(startPosition, endPosition)
+
+									chart(store.canvas, drawRecords);
+									return data
+								})
+								.then((data) => {
+									saveDataToDB(db, store.currentMode, data)
 								})
 						}
-					})
+					});
 			}
 		}
 	);
+
+	onMounted(() => {
+		store.canvas = canvas.value
+	})
 
 	const getKeyRange = (cursorStart: number, cursorEnd: number): IDBKeyRange => {
 		const lowerBound: string = `${ cursorStart }-01-01`;

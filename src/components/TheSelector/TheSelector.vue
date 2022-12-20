@@ -2,11 +2,14 @@
 	import { ref, computed, watch } from 'vue';
 	import { store } from '../../store';
 
+	/** props */
 	const props = defineProps<{
 		list: Array<number>,
+		initValue: any,
 		rangeName: string,
 	}>();
 
+	/** data */
 	const selected = ref<number| null>(null);
 	const optionItems = ref<HTMLOptionsCollection | []>([]);
 
@@ -22,16 +25,21 @@
 		return false
 	});
 
-	watch(() => store[`cursor${ props.rangeName }`], (val: number) => {
-		if (val) {
-			selected.value = val
-		}
-	});
+	watch(() => props.initValue, (initValue) => {
+		selected.value = initValue;
+	})
 </script>
 
 <template>
 	<select class="the-selector" v-model="selected">
-		<option v-for="item in list" :value="item" :disabled="isDisabled" ref="optionItems">{{ item }}</option>
+		<option
+			v-for="item in list"
+			:value="item"
+			:disabled="isDisabled"
+			ref="optionItems"
+		>
+			{{ item }}
+		</option>
 	</select>
 </template>
 

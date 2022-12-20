@@ -12,6 +12,12 @@ const VIEW_WIDTH: number = DPI_WIDTH - PADDING_X;
 
 let verticalCanvasCenter: number = 0;
 
+/**
+ * Draw grid
+ * @param ctx
+ * @param step
+ * @param linesNumber
+ */
 function gridDraw(ctx: CanvasRenderingContext2D, step: number, linesNumber: number[]): void {
 	// === x axis
 	ctx.beginPath()
@@ -52,6 +58,13 @@ function gridDraw(ctx: CanvasRenderingContext2D, step: number, linesNumber: numb
 	// ===
 }
 
+/**
+ * Draw column
+ * @param ctx
+ * @param yMax
+ * @param yMin
+ * @param valuesArray
+ */
 function dataDraw(ctx: CanvasRenderingContext2D, yMax: number, yMin: number, valuesArray: number[]): void {
 	const delta = Math.abs(yMax) + Math.abs(yMin)
 	const yRatio = VIEW_HEIGHT/delta
@@ -67,12 +80,22 @@ function dataDraw(ctx: CanvasRenderingContext2D, yMax: number, yMin: number, val
 	}
 }
 
+/**
+ * Draw column
+ * @param array
+ * @returns {Array} of minimum and maximum value
+ */
 function boundaries(array: number[]): number[] {
 	const max: number = Math.floor(Math.max.apply(null,array))
 	const min: number = Math.floor(Math.min.apply(null, array))
 	return [max, min]
 }
 
+/**
+ * Draw chart
+ * @param canvas
+ * @param data
+ */
 export function chart<T>(canvas: HTMLCanvasElement, data: Array<ItemData>): void {
 	verticalCanvasCenter = 0;
 

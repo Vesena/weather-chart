@@ -1,40 +1,57 @@
 <script setup lang="ts">
 	import { onMounted } from 'vue';
-	import { getData, getIndexedDBKeys, saveToDB } from './utils';
+	import {
+		getData,
+		saveDataToDB,
+		createSelectorList,
+		getIndexedDBRecords,
+	} from './utils';
 	import type { ItemData } from './types';
 	import { store } from './store';
 	import TheButton from './components/TheButton/TheButton.vue';
 	import RangePicker from './components/RangePicker/RangePicker.vue';
 	import TheChart from './components/TheChart/TheChart.vue';
+	import { chart } from './chart';
 
 	onMounted(() => {
 		const dbRequest: IDBOpenDBRequest = indexedDB.open('weather_service_archive');
 
+		dbRequest.onerror = (event: any) => {
+			throw new Error(event.target.error);
+		};
+
 		dbRequest.onupgradeneeded = (event: any): void => {
-			const db: IDBDatabase = event.target.result
+			const db: IDBDatabase = event.target.result;
+			db.onerror = (event: any) => {
+				throw new Error(event.target.error);
+			};
+
 			db.createObjectStore('temperature', { keyPath: "t" });
 			db.createObjectStore('precipitation', { keyPath: "t" });
-			getData<ItemData>(store.currentMode)
-				.then((data) => {
-					saveToDB(db, store.currentMode, data);
-				})
-		}
+		};
 
 		dbRequest.onsuccess = (event: any): void => {
-			const db: IDBDatabase = event.target.result
-			store.db = db
-			getIndexedDBKeys(db, store.currentMode)
-				.then((keys) => setInitParams(keys));
+			store.db = event.target.result;
+			store.isPageLoading = true;
+			getIndexedDBRecords(store.db, store.currentMode)
+				.then((records) => {
+					if (records.length) {
+						store.list = createSelectorList(records);
+						store.isPageLoading = false;
+					} else {
+						getData<ItemData>(store.currentMode)
+							.then((data) => {
+								store.list = createSelectorList(data);
+								chart(store.canvas, data);
+								return data;
+							})
+							.then((data) => {
+								saveDataToDB(store.db, store.currentMode, data);
+							});
+					}
+				});
 		}
 	});
-
-	/** methods */
-	const setInitParams = (keys: string[]): void => {
-		store.listBorderTop = keys[0];
-		store.listBorderBottom = keys[keys.length - 1];
-		store.cursorStart = new Date(store.listBorderTop).getFullYear();
-		store.cursorEnd = new Date(store.listBorderBottom).getFullYear();
-	};
 </script>
 
 <template>

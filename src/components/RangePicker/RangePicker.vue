@@ -1,40 +1,27 @@
 <script setup lang="ts">
-	import { ref, watch } from 'vue';
+	import { watch } from 'vue';
 	import { store } from '../../store';
 	import TheSelector from '../TheSelector/TheSelector.vue';
 
-	/** data */
-	let list = ref<Array<number>>([]);
-
-	watch(() => store.listBorderTop, (val: string) => {
-		if (val) {
-			list.value = createList(store.listBorderTop, store.listBorderBottom);
+	watch(() => store.list, (list) => {
+		if (list) {
+			store.cursorStart = list[0];
+			store.cursorEnd = list[list.length - 1];
 		}
-	})
-
-	/** methods */
-	const createList = (start: string, end: string): Array<number> => {
-		const arr: Array<number> = [];
-		const startYear: number = new Date(start).getFullYear();
-		const endYear: number = new Date(end).getFullYear();
-
-		for (let i = startYear; i <= endYear; i++) {
-			arr.push(i);
-		}
-
-		return arr;
-	}
+	});
 </script>
 
 <template>
 	<div class="app__selector">
 		<the-selector
-			:list="list"
+			:list="store.list"
+			:init-value="store.cursorStart"
 			:range-name="'Start'"
 			v-model="store.cursorStart"
 		/>
 		<the-selector
-			:list="list"
+			:list="store.list"
+			:init-value="store.cursorEnd"
 			:range-name="'End'"
 			v-model="store.cursorEnd"
 		/>

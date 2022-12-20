@@ -1,21 +1,21 @@
 import { reactive } from 'vue';
 
 interface Store {
-	isSaved: boolean,
+	canvas: any,
 	currentMode: string,
-	listBorderTop: string,
-	listBorderBottom: string,
-	cursorStart: number,
 	cursorEnd: number,
+	cursorStart: number,
 	db: IDBDatabase | null,
+	isPageLoading: boolean,
+	list: number[],
 }
 
 export const store: Store = reactive({
-	isSaved: false,
+	canvas: null,
 	currentMode: 'temperature',
-	listBorderTop: '',
-	listBorderBottom: '',
-	cursorStart: 0,
 	cursorEnd: 0,
+	cursorStart: 0,
 	db: null,
+	isPageLoading: false,
+	list: [],
 });
